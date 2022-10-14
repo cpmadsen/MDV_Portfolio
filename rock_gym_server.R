@@ -2,6 +2,7 @@
 # Tab 1 - Rock Gym#
 # # # # # # # # # #
 rock_dat = read_csv("data/rock_dat.csv")
+rock_visit_dat = read_csv('data/rock_visit_data.csv')
 
 RockDat = reactive({
   
@@ -13,10 +14,6 @@ RockDat = reactive({
     mutate(datetime = as_datetime(as.character(date))) %>% 
     filter(datetime %within% lubridate::interval(min_month,max_month))
 })
-
-# NotRockDat = reactive({
-#   rock_dat %>% mutate(month = month(date)) %>% anti_join(RockDat())
-# })
 
 RockDatSummarised = reactive({
   RockDat() %>% 
@@ -32,21 +29,56 @@ RockDatSummarised = reactive({
     group_by(date,Type) %>% 
     summarise(Amount = sum(Amount))
 })
-# 
-# NotRockDatSummarised = reactive({
-#   NotRockDat() %>% 
-#     pivot_longer(cols = c("revenue","cost","gross_profit"), 
-#                  names_to = "Type",values_to = "Amount") %>% 
-#     mutate(Type = case_when(
-#       Type == 'revenue' ~ 'Revenue',
-#       Type == 'cost' ~ 'Cost',
-#       Type == 'gross_profit' ~ "Gross Profit",
-#       T ~ Type 
-#     )) %>% 
-#     mutate(Type = factor(Type, levels = c("Revenue","Cost","Gross Profit"))) %>% 
-#     group_by(date,Type) %>% 
-#     summarise(Amount = sum(Amount))
-# })
+
+RockVisitDat = reactive({
+  temp_dat = rock_visit_dat %>%
+    filter(location %in% input$visits_location_selector) %>% 
+    filter(month %in% input$visits_month_selector) %>% 
+    filter(day_of_week %in% input$visits_day_selector) 
+  
+  if(input$visits_time_scale == "Day"){
+    temp_dat = temp_dat %>% 
+      group_by(x = hour_of_day) %>% 
+      summarise(across(c("visits","drop_ins","members"), mean, na.rm=T))
+  } else if(input$visits_time_scale == "Week"){
+    temp_dat = temp_dat %>% 
+      group_by(x = day_of_week) %>% 
+      summarise(across(c("visits","drop_ins","members"), mean, na.rm=T))
+  } else if(input$visits_time_scale == "Month"){
+    temp_dat = temp_dat %>% 
+      group_by(x = month) %>% 
+      summarise(across(c("visits","drop_ins","members"), mean, na.rm=T))
+  }
+  
+  temp_dat = temp_dat %>% 
+    pivot_longer(c("drop_ins","members"), 
+                 names_to = "membership_status", 
+                 values_to = visit_number) %>% 
+    select(-visits)
+  
+  if(input$visits_member_filter == "Members"){
+    temp_dat %>% 
+      filter(membership_status == "members")
+  } else if(input$visits_member_filter == "Drop-ins"){
+    temp_dat %>% 
+      filter(membership_status == "drop_ins")
+  } else if(length(input$visits_member_filter) == 2){
+    temp_dat
+  }
+})
+
+## Daily Operations ##
+output$rock_visit_barplot = renderPlotly({
+  ggplotly(
+    rock_visit_dat %>% 
+      ggplot() + 
+      geom_col(aes(x = x, y = visit_number, fill = membership_status)) + 
+      labs(x = "", y =  "Number of Visits")
+    
+  )
+})
+
+## CFO SUMMARY ##
 
 # Summary stats
 
