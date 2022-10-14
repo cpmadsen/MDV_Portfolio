@@ -31,50 +31,50 @@ uk_cycling_total_schemes_cost = valueBoxOutput('uk_tot_scheme_cost', width = 4)
 uk_cycling_df_t_funding = infoBoxOutput('uk_tot_df_t_funding', width = 4)
 
 # 3. Map for center of dashboard tab.
-uk_cycling_map_element = shinydashboardPlus::box(
-  title = tagList(shiny::icon("map")," Cycling Accidents in England"),
-  status = "navy",
-  solidHeader = T,
-  collapsible = T,
-  width = 12,
-  height = uk_map_height,
+uk_cycling_map_element = card(
+  card_title(tagList(shiny::icon("map")," Cycling Accidents in England")),
+  #status = "navy",
+  #solidHeader = T,
+  #collapsible = T,
+  #width = 12,
+  #height = uk_map_height,
   leafletOutput('uk_cycling_leaflet', height = uk_map_height)
 )
 
 # 4. Linegraph of accidents by region
-uk_cycling_linegraph_element = shinydashboardPlus::box(
-  title = tagList(shiny::icon("circle")," Accidents by Region Linegraph"),
-  status = "teal",
-  solidHeader = T,
-  collapsible = T,
-  width = 12,
-  height = half_uk_map_h,
+uk_cycling_linegraph_element = card(
+  card_header(tagList(shiny::icon("circle")," Accidents by Region Linegraph")),
+  # status = "teal",
+  # solidHeader = T,
+  # collapsible = T,
+  # width = 12,
+  # height = half_uk_map_h,
   numericInput(inputId = 'number_lines',label = 'Number of Regions Shown', 
                min = 3, max = 9, value = 5),
   plotlyOutput('cycling_lineplot', height = half_uk_map_h)
 )
 
 # 5. Donut plot of accidents by region
-cycling_acc_region_barplot_element = shinydashboardPlus::box(
-  title = tagList(shiny::icon("circle")," Accidents by Region Barplot"),
-  status = "purple",
-  solidHeader = T,
-  collapsible = T,
-  width = 12,
-  height = half_uk_map_h,
+cycling_acc_region_barplot_element = card(
+  card_header(tagList(shiny::icon("circle")," Accidents by Region Barplot")),
+  # status = "purple",
+  # solidHeader = T,
+  # collapsible = T,
+  # width = 12,
+  # height = half_uk_map_h,
   plotlyOutput('cycling_acc_region_barplot', height = half_uk_map_h)
 )
 #cycling_acc_region_donut_element = plotlyOutput('cycling_acc_region_donut', height = uk_map_height)
 
 ### Design Blocks
 uk_toprow_block = fluidRow(
-  shinydashboardPlus::box(
-    title = tagList(shiny::icon("calendar"),"Cycling Stats Year Selector"), 
-    status = "success",
-    collapsible = T,
-    collapsed = F,
-    solidHeader = T,
-    width = 12,
+  card(
+    card_title(tagList(shiny::icon("calendar"),"Cycling Stats Year Selector")), 
+    # status = "success",
+    # collapsible = T,
+    # collapsed = F,
+    # solidHeader = T,
+    # width = 12,
     uk_year_selector_element
   )
 )
@@ -124,8 +124,8 @@ uk_thirdrow_block = fluidRow(
 ### Panel design
 
 
-uk_cycling = tabItem(
-  tabName = 'uk_cycling',
+uk_cycling = tabPanel(
+  title = 'UK Cycling Safety',
   
   uk_toprow_block,
   
@@ -133,5 +133,7 @@ uk_cycling = tabItem(
   
   #uk_linegraph_block,
   
-  uk_thirdrow_block
+  uk_thirdrow_block,
+  
+  icon = icon('bicycle')
 )

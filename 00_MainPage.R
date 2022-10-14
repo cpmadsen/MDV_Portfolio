@@ -4,7 +4,7 @@ background_img_3 = "carousel_pictures/Germany_BlackForest.png"
 
 title_insert = absolutePanel(
   fluidRow(
-  HTML("<br><br><br>"),
+  HTML("<br><br><br><br><br><br>"),
   h1("MADSEN ANALYTICS",
      style = 'height: 50px; font-size:65px; color:white; text-align:center;'),
   HTML("<br><br>"),
@@ -94,8 +94,9 @@ contact_form_insert = fluidRow(
 #                        background-image: url('%s');
 #                        "
 
-main_page = tabItem(
-  tabName = "home",
+main_page = tabPanel(
+  title = "Home",
+  icon = icon('home'),
   
   #tags$script(src = "Javascript_Parallax.js"),
   # shinyWidgets::setBackgroundImage(src = "waterfall_gif.gif", 

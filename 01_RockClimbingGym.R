@@ -79,91 +79,11 @@ top_row = fluidRow(
   )
 )
 
-rock_gym = tabItem(
-  tabName = "rock_gym",
+rock_gym = tabPanel(
+  title = "Rock Gym",
+  icon = icon('warehouse'),
   h2("Rock Gym CFO Dashboard (Q1 and Q2, 2022)"),
-  box(title = "Select Months to Compare", month_pick_input, width = 12,
+  card(title = "Select Months to Compare", month_pick_input, #width = 12,
       collapsible = T, collapsed = T),
   top_row
 )
-
-# top_row = fluidRow(
-#   column(width = 4,
-#          h2("Summary Widgets"),
-#          fluidRow(
-#            column(width = 6,
-#                   box(title = "Vancouver",
-#                       revenue_summary_element_van,
-#                       revenue_change_summary_element_van,
-#                       width = 12, height = box_height)),
-#            column(width = 6,
-#                   box(title = "Victoria",
-#                        revenue_summary_element_vic,
-#                        revenue_change_summary_element_vic,
-#                        width = 12, height = box_height))),
-#          style = '{padding-left:5px;padding-right:5px;}'
-#   ),
-#   column(width = 8,
-#          h2("Figures"),
-#          box(gross_prof_line_element, width = 12, height = box_height,
-#              style = '.box-header.with-border{display:none}')
-#   )
-# )
-
-#'.box-header.with-border{display:none}'
-# Was from style of box
-# width = 12, 
-# height = box_height,
-# style = 'text-size:20px'
-# #tags$style(HTML('height:300px;'))
-
-# middle_row = fluidRow(
-#   column(width = 4,
-#          fluidRow(
-#            column(width = 6,
-#                   box(title = "Vancouver",
-#                       cost_summary_element_van,
-#                       cost_change_summary_element_van,
-#                       width = 12, height = box_height)),
-#            column(width = 6,
-#                   box(title = "Victoria",
-#                       cost_summary_element_vic,
-#                       cost_change_summary_element_vic,
-#                       width = 12, height = box_height)))
-#   ),
-#   column(width = 8,
-#          box(membership_line_element, width = 12, height = box_height,
-#              style = '.box-header.with-border{display:none}')
-#   )
-# )
-# 
-# bottom_row = fluidRow(
-#   column(width = 4,
-#          fluidRow(
-#            column(width = 6,
-#                   box(title = "Vancouver",
-#                       gross_profit_summary_element_van,
-#                       gross_profit_change_summary_element_van,
-#                       width = 12, height = box_height),
-#                   style = '.class="col-sm-6" {padding-right:0px;padding-left:0px}'),
-#            column(width = 6,
-#                   box(title = "Victoria",
-#                       gross_profit_summary_element_vic,
-#                       gross_profit_change_summary_element_vic,
-#                       width = 12, height = box_height)))
-#   ),
-#   column(width = 8,
-#          box(employee_line_element, width = 12, height = box_height,
-#              style = '.box-header.with-border{display:none}')
-#   )
-# )
-
-# rock_gym = tabItem(
-#   tabName = "rock_gym",
-#   h2("Rock Gym CFO Dashboard (Q1 and Q2, 2022)"),
-#   box(title = "Month to Compare", month_pick_input, width = 12,
-#       collapsible = T, collapsed = T),
-#   top_row,
-#   middle_row,
-#   bottom_row
-# )
