@@ -45,7 +45,8 @@ ui = shiny::navbarPage(
   # ),
   
   theme = app_lighttTheme,
-  
+  header = switchInput(inputId = 'dark_mode', label = 'Mode', 
+                       onLabel = "Dark", offLabel = 'Light'),
   #fluid = T,
   useShinyjs(),
 

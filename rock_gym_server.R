@@ -31,50 +31,185 @@ RockDatSummarised = reactive({
 })
 
 RockVisitDat = reactive({
+  
+  #Take two days selected and make it into a vector of day names to filter with.
+  day_range = c(
+    as.numeric(factor(input$visits_day_selector[1],levels = c("Sunday", "Monday", "Tuesday","Wednesday",
+                                                   "Thursday", "Friday", "Saturday"))):
+    as.numeric(factor(input$visits_day_selector[2],levels = c("Sunday", "Monday", "Tuesday","Wednesday",
+                                                   "Thursday", "Friday", "Saturday")))
+  ) %>% 
+    wday(., abbr=F,label=T,week_start = 7)
+  
+  #Apply filters that are easy to apply: location, month and day.
   temp_dat = rock_visit_dat %>%
     filter(location %in% input$visits_location_selector) %>% 
-    filter(month %in% input$visits_month_selector) %>% 
-    filter(day_of_week %in% input$visits_day_selector) 
-  
-  if(input$visits_time_scale == "Day"){
-    temp_dat = temp_dat %>% 
-      group_by(x = hour_of_day) %>% 
-      summarise(across(c("visits","drop_ins","members"), mean, na.rm=T))
-  } else if(input$visits_time_scale == "Week"){
-    temp_dat = temp_dat %>% 
-      group_by(x = day_of_week) %>% 
-      summarise(across(c("visits","drop_ins","members"), mean, na.rm=T))
-  } else if(input$visits_time_scale == "Month"){
-    temp_dat = temp_dat %>% 
-      group_by(x = month) %>% 
-      summarise(across(c("visits","drop_ins","members"), mean, na.rm=T))
-  }
+    filter(ymd(paste0('2022-',month,'-01')) %within% interval(
+      ymd(paste0('2022-',input$visits_month_selector[1],'-01')),
+      ymd(paste0('2022-',input$visits_month_selector[2],'-01'))
+    )) %>% 
+    filter(day_of_week %in% day_range) 
   
   temp_dat = temp_dat %>% 
+    select(-visits) %>% 
     pivot_longer(c("drop_ins","members"), 
                  names_to = "membership_status", 
-                 values_to = visit_number) %>% 
-    select(-visits)
+                 values_to = "visits")
   
-  if(input$visits_member_filter == "Members"){
-    temp_dat %>% 
-      filter(membership_status == "members")
-  } else if(input$visits_member_filter == "Drop-ins"){
-    temp_dat %>% 
-      filter(membership_status == "drop_ins")
-  } else if(length(input$visits_member_filter) == 2){
-    temp_dat
+  #Add a 'none' variable so that facetting doesn't normally do much in the
+  # group_by line... If the user chooses to facet by a variable, then this switches
+  # from the fake 'none' variable to their facetting variable.
+  temp_dat = temp_dat %>% 
+    mutate(none = 1)
+  
+  #Depending on the math mode chosen, average or sum the visits at the time scale.
+  if(input$visits_math_mode == "Average"){
+    if(input$visits_time_scale == "Day"){
+      temp_dat = temp_dat %>% 
+        group_by(x = hour_of_day, membership_status, !!sym(input$visits_facet_option)) %>% 
+        summarise(visits = mean(visits, na.rm=T)) %>% 
+        mutate(x = factor(x, levels = paste0(c(6:22),"H"))) %>% 
+        arrange(x)
+    } else if(input$visits_time_scale == "Week"){
+      temp_dat = temp_dat %>% 
+        group_by(x = day_of_week, membership_status, !!sym(input$visits_facet_option)) %>% 
+        summarise(visits = mean(visits, na.rm=T)) %>% 
+        mutate(x = factor(x, levels = wday(1:7, week_start = 1, label = T, abbr = F))) %>% 
+        arrange(x)
+    } else if(input$visits_time_scale == "Month"){
+      temp_dat = temp_dat %>% 
+        group_by(x = month, membership_status, !!sym(input$visits_facet_option)) %>% 
+        summarise(visits = mean(visits, na.rm=T)) %>% 
+        mutate(x = factor(x, levels = month(1:6, label = T, abbr = T))) %>% 
+        arrange(x)
+    }
+  } else if(input$visits_math_mode == "Sum"){
+    if(input$visits_time_scale == "Day"){
+      temp_dat = temp_dat %>% 
+        group_by(x = hour_of_day, membership_status, !!sym(input$visits_facet_option)) %>% 
+        summarise(visits = sum(visits, na.rm=T)) %>% 
+        mutate(x = factor(x, levels = paste0(c(6:22),"H"))) %>% 
+        arrange(x)
+    } else if(input$visits_time_scale == "Week"){
+      temp_dat = temp_dat %>% 
+        group_by(x = day_of_week, membership_status, !!sym(input$visits_facet_option)) %>% 
+        summarise(visits = sum(visits, na.rm=T)) %>% 
+        mutate(x = factor(x, levels = wday(1:7, week_start = 1, label = T, abbr = F))) %>% 
+        arrange(x)
+    } else if(input$visits_time_scale == "Month"){
+      temp_dat = temp_dat %>% 
+        group_by(x = month, membership_status,!!sym(input$visits_facet_option)) %>% 
+        summarise(visits = sum(visits, na.rm=T)) %>% 
+        mutate(x = factor(x, levels = month(1:6, label = T, abbr = T))) %>% 
+        arrange(x)
+    }
   }
+  
+  #Apply membership filter to data.
+  temp_dat = temp_dat %>% 
+    mutate(membership_status = case_when(
+      membership_status == "drop_ins" ~ "Drop-ins",
+      membership_status == "members" ~ "Members"
+    )) %>% 
+    filter(membership_status %in% input$visits_member_filter) 
+  
+  # If user chooses to facet by week or month, we have to set factor levels.
+  if(!!sym(input$visits_facet_option) == "month"){
+    temp_dat = temp_dat %>% 
+      mutate(month = factor(month, levels = month(1:6, label = T, abbr = T)))
+  } else if(!!sym(input$visits_facet_option) == "day_of_week"){
+    temp_dat = temp_dat %>% 
+      mutate(day_of_week = factor(day_of_week, levels = wday(1:7, week_start = 1, label = T, abbr = F)))
+  }
+  
+  # Summarise values!
+   temp_dat %>%
+    group_by(x,membership_status,!!sym(input$visits_facet_option)) %>%
+    summarise(visits = sum(visits,na.rm=T))
 })
+
+output$data_test = renderDataTable({RockVisitDat()})
 
 ## Daily Operations ##
 output$rock_visit_barplot = renderPlotly({
+
   ggplotly(
-    rock_visit_dat %>% 
-      ggplot() + 
-      geom_col(aes(x = x, y = visit_number, fill = membership_status)) + 
-      labs(x = "", y =  "Number of Visits")
-    
+      RockVisitDat() %>%
+        ggplot() + 
+        geom_col(aes(x = x, y = visits, fill = membership_status)) + 
+        scale_fill_brewer(palette = 'Dark2') +
+        facet_wrap(~ .data[[input$visits_facet_option]], 
+                     ncol = 1) +
+        labs(title = paste0("Visits to Rock Gym by ",input$visits_time_scale),
+             x = "", y =  "Number of Visits", fill = "Membership") + 
+        theme_bw()
+    )
+})
+
+# Reset of rock visitation filters.
+observeEvent(input$visits_reset_filters, {
+updateCheckboxGroupInput(
+  session = session,
+  inputId = 'visits_member_filter',
+    label = "Membership Type",
+    choices = c('Members','Drop-ins'),
+    selected = c('Members','Drop-ins')
+    #size = 'md'
+  )
+  
+  # Location selector
+updateCheckboxGroupInput(
+  session = session,
+  inputId = 'visits_location_selector',
+    label = "Location",
+    choices = c("Vancouver","Victoria"),
+    selected = c("Vancouver","Victoria")
+    # size = 'md'
+  )
+  
+  # Day of week selector
+updateSliderTextInput(
+  session = session,
+  inputId = 'visits_day_selector',
+    label = 'Days to Include',
+    choices = wday(1:7,label=T,abbr=F),
+    selected = wday(1:7,label=T,abbr=F)
+  )
+  
+  # month selector
+updateSliderTextInput(
+  session = session,
+  inputId = 'visits_month_selector',
+    label = 'Months to Include',
+    choices = month(c(1:6),label=T,abbr=T),
+    selected = month(c(1:6),label=T,abbr=T)
+  )
+  
+  # Time scale selector
+updateSelectInput(
+  session = session,
+  inputId = 'visits_time_scale',
+    label = 'Time Scale',
+    choices = c("Day","Week","Month"),
+    selected = "Day"
+  )
+  
+  # Change method between average and sum
+updateRadioButtons(
+  session = session,
+  inputId = 'visits_math_mode',
+    label = "Method",
+    choices = c("Average","Sum"),
+    selected = "Average"
+  )
+  
+  # Facet dropdown
+updateSelectInput(
+  session = session,
+    inputId = 'visits_facet_option',
+    label = "Split Plot by...",
+    choices = c("none","location","month","day_of_week"),
+    selected = "none"
   )
 })
 
@@ -82,161 +217,119 @@ output$rock_visit_barplot = renderPlotly({
 
 # Summary stats
 
-output$gross_profit_summary_van = renderValueBox({
-  valueBox(
-    subtitle = h4("Gross Profit"),
-    value = tagList(
-      h2(
-        RockDat() %>%
+output$gross_profit_sum_van = renderText({
+ RockDat() %>%
           filter(location == "Vancouver") %>%
           summarise(gross_profit = sum(gross_profit,na.rm=T)) %>%
           pull(gross_profit) %>% 
           dollar()
-      ),
-      HTML("<BR>"),
-      h4(em(paste0(RockDat() %>%
-                     filter(location == "Vancouver") %>%
-                     summarise(gross_profit_change = round(100*(last(gross_profit) - first(gross_profit))/last(gross_profit),1)) %>%
-                     pull(gross_profit_change),"%",
-                   " change between ",
-                   month(min(RockDat()$date),abbr=T,label=T),
-                   " - ",
-                   month(max(RockDat()$date),abbr=T,label=T))))
-    ),
-    icon = icon('dollar'),
-    color = 'purple'
-  )
 })
 
-output$revenue_summary_van = renderValueBox({
-  valueBox(
-    subtitle = h4("Revenue"),
-    value = tagList(
-      h2(
+output$gross_profit_change_van = renderText({
+  paste0(RockDat() %>%
+           filter(location == "Vancouver") %>%
+           summarise(gross_profit_change = round(100*(last(gross_profit) - first(gross_profit))/last(gross_profit),1)) %>%
+           pull(gross_profit_change),"%",
+         " change between ",
+         month(min(RockDat()$date),abbr=T,label=T),
+         " - ",
+         month(max(RockDat()$date),abbr=T,label=T))
+})
+
+output$revenue_sum_van = renderText({
         RockDat() %>%
           filter(location == "Vancouver") %>%
           summarise(revenue = sum(revenue,na.rm=T)) %>%
           pull(revenue) %>% 
           dollar()
-      ),
-      HTML("<BR>"),
-      h4(em(paste0(RockDat() %>%
+})
+
+output$revenue_change_van = renderText({
+      paste0(RockDat() %>%
                      filter(location == "Vancouver") %>%
                      summarise(revenue_change = round(100*(last(revenue) - first(revenue))/last(revenue),1)) %>%
                      pull(revenue_change),"%",
                    " change between ",
                    month(min(RockDat()$date),abbr=T,label=T),
                    " - ",
-                   month(max(RockDat()$date),abbr=T,label=T))))
-    ),
-    icon = icon('money-bills'),
-    color = 'green'
-  )
+                   month(max(RockDat()$date),abbr=T,label=T))
 })
 
-output$cost_summary_van = renderValueBox({
-  valueBox(
-    subtitle = h4("Cost"),
-    value = tagList(
-      h2(
-        RockDat() %>%
+output$cost_sum_van = renderText({
+  RockDat() %>%
           filter(location == "Vancouver") %>%
           summarise(cost = sum(cost,na.rm=T)) %>%
           pull(cost) %>% 
           dollar()
-      ),
-      HTML("<BR>"),
-      h4(em(paste0(RockDat() %>%
+})
+
+output$cost_change_van = renderText({
+ paste0(RockDat() %>%
                      filter(location == "Vancouver") %>%
                      summarise(cost_change = round(100*(last(cost) - first(cost))/last(cost),1)) %>%
                      pull(cost_change),"%",
                    " change between ",
                    month(min(RockDat()$date),abbr=T,label=T),
                    " - ",
-                   month(max(RockDat()$date),abbr=T,label=T))))
-    ),
-    icon = icon('money-bill-wave'),
-    color = 'orange'
-  )
+                   month(max(RockDat()$date),abbr=T,label=T))
 })
 
 # Victoria summary boxes.
-output$gross_profit_summary_vic = renderValueBox({
-  valueBox(
-    subtitle = h4("Gross Profit"),
-    value = tagList(
-      h2(
-        RockDat() %>%
+output$gross_profit_sum_vic = renderText({
+ RockDat() %>%
           filter(location == "Victoria") %>%
           summarise(gross_profit = sum(gross_profit,na.rm=T)) %>%
           pull(gross_profit) %>% 
           dollar()
-      ),
-      HTML("<BR>"),
-      h4(em(paste0(RockDat() %>%
+})
+
+output$gross_profit_change_vic = renderText({
+      paste0(RockDat() %>%
                      filter(location == "Victoria") %>%
                      summarise(gross_profit_change = round(100*(last(gross_profit) - first(gross_profit))/last(gross_profit),1)) %>%
                      pull(gross_profit_change),"%",
                    " change between ",
                    month(min(RockDat()$date),abbr=T,label=T),
                    " - ",
-                   month(max(RockDat()$date),abbr=T,label=T))))
-    ),
-    icon = icon('dollar'),
-    color = 'purple'
-  )
+                   month(max(RockDat()$date),abbr=T,label=T))
 })
 
-output$revenue_summary_vic = renderValueBox({
-  valueBox(
-    subtitle = h4("Revenue"),
-    value = tagList(
-      h2(
-        RockDat() %>%
+output$revenue_sum_vic = renderText({
+  RockDat() %>%
           filter(location == "Victoria") %>%
           summarise(revenue = sum(revenue,na.rm=T)) %>%
           pull(revenue) %>% 
           dollar()
-      ),
-      HTML("<BR>"),
-      h4(em(paste0(RockDat() %>%
+})
+
+output$revenue_change_vic = renderText({
+     paste0(RockDat() %>%
                      filter(location == "Victoria") %>%
                      summarise(revenue_change = round(100*(last(revenue) - first(revenue))/last(revenue),1)) %>%
                      pull(revenue_change),"%",
                    " change between ",
                    month(min(RockDat()$date),abbr=T,label=T),
                    " - ",
-                   month(max(RockDat()$date),abbr=T,label=T))))
-    ),
-    icon = icon('money-bills'),
-    color = 'green'
-  )
+                   month(max(RockDat()$date),abbr=T,label=T))
 })
 
-output$cost_summary_vic = renderValueBox({
-  valueBox(
-    subtitle = h4("Cost"),
-    value = tagList(
-      h2(
-        RockDat() %>%
+output$cost_sum_vic = renderText({
+  RockDat() %>%
           filter(location == "Victoria") %>%
           summarise(cost = sum(cost,na.rm=T)) %>%
           pull(cost) %>% 
           dollar()
-      ),
-      HTML("<BR>"),
-      h4(em(paste0(RockDat() %>%
+})
+
+output$cost_change_vic = renderText({
+  paste0(RockDat() %>%
                      filter(location == "Victoria") %>%
                      summarise(cost_change = round(100*(last(cost) - first(cost))/last(cost),1)) %>%
                      pull(cost_change),"%",
                    " change between ",
                    month(min(RockDat()$date),abbr=T,label=T),
                    " - ",
-                   month(max(RockDat()$date),abbr=T,label=T))))
-    ),
-    icon = icon('money-bill-wave'),
-    color = 'orange'
-  )
+                   month(max(RockDat()$date),abbr=T,label=T))
 })
 
 # Plots
@@ -249,8 +342,8 @@ max_money_figure = rock_dat %>%
   pull(total)
 
 output$gross_profit_linegraph = renderPlotly({
-   plotly::ggplotly(
-
+  plotly::ggplotly(
+    
     rock_dat %>%
       # filter(date %within% interval(ymd('2022-02-01'),ymd('2022-05-01')))
       pivot_longer(cols = c("revenue","cost","gross_profit"),
@@ -281,8 +374,8 @@ output$gross_profit_linegraph = renderPlotly({
                    data = RockDatSummarised()) +
       scale_y_continuous(limits = c(-(max_money_figure/32),max_money_figure),
                          labels = scales::dollar_format(scale=0.001,suffix = 'K')) +
-      scale_fill_brewer(palette = my_palette) +
-      scale_color_brewer(palette = my_palette) +
+      scale_fill_brewer(palette = 'Dark2') +
+      scale_color_brewer(palette = 'Dark2') +
       labs(title = 'Gross Profit Breakdown',
            fill = "",
            x = "Month",
@@ -293,7 +386,7 @@ output$gross_profit_linegraph = renderPlotly({
             title = element_text(size = 14, face = 'bold'),
             legend.position="none") +
       guides(col = "none"),
-    height = 400
+    height = 300
   ) %>% layout(legend = list(orientation="h",x = 0.45, y = 1.1))
 })
 
@@ -328,7 +421,7 @@ output$employee_linegraph = renderPlotly({
             title = element_text(size = 14, face = 'bold'),
             legend.position="none") + 
       guides(col = "none"),
-    height = 400
+    height = 300
   ) %>% layout(legend = list(orientation="h",x = 0.45, y = 1.1))
 })
 
@@ -363,6 +456,6 @@ output$members_linegraph = renderPlotly({
             title = element_text(size = 14, face = 'bold'),
             legend.position="none") + 
       guides(col = "none"),
-    height = 400
+    height = 300
   ) %>% layout(legend = list(orientation="h",x = 0.45, y = 1.1))
 })
