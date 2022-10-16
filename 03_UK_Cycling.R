@@ -26,29 +26,42 @@ uk_year_selector_element =
 uk_summary_cards = card_grid(
   card_width = 1/2,
   card(card_header("Fatal Accidents",
-                  class = 'bg-danger'),
-       card_body(textOutput('uk_fatal_accidents'))),
+                  class = 'bg-danger', 
+                  style = 'font-size:18px;text-align:center'),
+       card_body(textOutput('uk_fatal_accidents')), 
+       style = 'font-size:18px;text-align:center'),
   card(card_header("Total Projects Funded",
-                  class = 'bg-success'),
-       card_body(textOutput('uk_cycling_total_projects'))),
+                  class = 'bg-success', 
+                  style = 'font-size:18px;text-align:center'),
+       card_body(textOutput('uk_tot_proj')), 
+       style = 'font-size:18px;text-align:center'),
   card(card_header("Total Accidents",
-                  class = 'bg-secondary'),
-       card_body(textOutput('uk_total_accidents'))),
+                  class = 'bg-secondary', 
+                  style = 'font-size:18px;text-align:center'),
+       card_body(textOutput('uk_total_accidents')), 
+       style = 'font-size:18px;text-align:center'),
   card(card_header("DFT Funding",
-                  class = 'bg-info'),
-       card_body(textOutput('uk_tot_df_t_funding'))),
+                  class = 'bg-info', 
+                  style = 'font-size:18px;text-align:center'),
+       card_body(textOutput('uk_tot_df_t_funding')), 
+       style = 'font-size:18px;text-align:center'),
   card(card_header("Serious Accidents",
-                  class = 'bg-warning'),
-       card_body(textOutput('uk_serious_accidents'))),
+                  class = 'bg-warning', 
+                  style = 'font-size:18px;text-align:center'),
+       card_body(textOutput('uk_serious_accidents')), 
+       style = 'font-size:18px;text-align:center'),
   card(card_header("Total Scheme Cost",
-                  class = 'bg-primary'),
-       card_body(textOutput('uk_tot_scheme_cost')))
+                  class = 'bg-primary', 
+                  style = 'font-size:18px;text-align:center'),
+       card_body(textOutput('uk_tot_scheme_cost')), 
+       style = 'font-size:18px;text-align:center')
 )
 
 # 3. Map for center of dashboard tab.
 uk_cycling_map_element = card(
   card_header(tagList(shiny::icon("map")," Cycling Accidents in England"),
-             class = 'primary'),
+             class = 'bs-primary',
+             style = "font-size:1.76rem;font-weight:500"),
   leafletOutput('uk_cycling_leaflet', height = uk_map_height)
 )
 
@@ -94,7 +107,7 @@ uk_cycling = tabPanel(
     sidebarPanel(
       accordion(
         accordion_item(
-          title = "Select Year",
+          title = "Dashboard Controls",
           uk_year_selector_element
         ),
         accordion_item(
@@ -106,7 +119,7 @@ uk_cycling = tabPanel(
     mainPanel(
       h1("England's Journey to make Cycling Safer",
          style = 'font-align:center;'),
-      HTML("<br><br><br>"),
+      HTML("<br><br>"),
       
       uk_map_and_figures_block,
       

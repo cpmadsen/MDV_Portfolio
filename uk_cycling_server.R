@@ -65,14 +65,14 @@ output$uk_tot_scheme_cost = renderText({
   scales::dollar(CyclingAccidents() %>% 
                    summarise(total = sum(annual_total_schemes_cost, na.rm=T)) %>% 
                    pull(total),
-                 prefix='')
+                 prefix=enc2utf8("\u00A3"))
 })
 
 output$uk_tot_df_t_funding = renderText({
   scales::dollar(CyclingAccidents() %>% 
                    summarise(total = sum(annual_df_t_funding, na.rm=T)) %>% 
                    pull(total),
-                 prefix='')
+                 prefix=enc2utf8("\u00A3"))
 })
 
 output$uk_cycling_leaflet = renderLeaflet({
@@ -121,7 +121,8 @@ output$cycling_lineplot = renderPlotly({
       scale_x_continuous(breaks = scales::pretty_breaks()) +
       scale_fill_brewer(palette = 'Set3') +
       ggpubr::theme_pubr() + 
-      theme(legend.position = 'none') +
+      theme(legend.position = 'none',
+            axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
             # plot.background = element_rect(fill = plot_background_colour),
             # panel.background = element_rect(fill = plot_background_colour)) + 
       labs(y = "No. Accidents per Region", 

@@ -26,7 +26,8 @@ map_controls_sidebar_panel = sidebarPanel(
               value = c(year(min(bigfoot_dat$most_recent_report)),
                         year(max(bigfoot_dat$most_recent_report))),
               timeFormat = "%YYYY",
-              sep = "")
+              sep = ""),
+  width = '100%'
 )
 
 # 2. Vertical bar plot for beside map.
@@ -45,26 +46,30 @@ bf_vertbarplot_element = card(
 
 bf_totalnumber_element = card(
   card_header("Total Reports",
-             class = 'bg-primary'),
-  card_body(textOutput('total_summary'))
+             class = 'bg-primary',
+             style = "font-size:22px;text-align:center;"),
+  card_body(textOutput('total_summary'), style = 'font-weight:700;font-size:22px;text-align:center')
 )
 
 bf_recentdate_element = card(
   card_header("Most Recent Report",
-             class = 'bg-warning'),
-  card_body(textOutput('most_recent_date'))
+             class = 'bg-warning',
+             style = "font-size:22px;text-align:center;"),
+  card_body(textOutput('most_recent_date'), style = 'font-weight:700;font-size:22px;text-align:center')
 )
 
 bf_recentplace_element = card(
   card_header("Most Recent Sighting",
-             class = 'bg-info'),
-  card_body(textOutput('most_recent_place'))
+             class = 'bg-info',
+             style = "font-size:22px;text-align:center;"),
+  card_body(textOutput('most_recent_place'), style = 'font-weight:700;font-size:22px;text-align:center')
 )
 
 # 4. Bigfoot in the news.
 bfnews_element = card(
   card_header(tagList(shiny::icon("newspaper"),"Bigfoot in the News"),
-             class = 'bg-warning'),
+             class = 'bg-warning',
+             style = "font-size:22px;"),
   #gradient = T,
   # width = 12,
   # boxToolSize = 'sm',
@@ -100,7 +105,7 @@ bigfoot_panel = tabPanel(
       accordion(
         selected = I("Reports Broken Down by Region"),
         accordion_item(
-          "Select Area of Analysis",
+          "Map Tools",
           map_controls_sidebar_panel),
         accordion_item(
           "Reports Broken Down by Region",

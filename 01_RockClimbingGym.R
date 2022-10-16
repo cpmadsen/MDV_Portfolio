@@ -91,95 +91,117 @@ month_pick_input = tagList(
 )#taglst close
 
 # Membership line graph
-membership_line_element = plotlyOutput('members_linegraph', height = 300)
+membership_line_element = card(plotlyOutput('members_linegraph', height = 300))
 
 # Employee line graph
-employee_line_element = plotlyOutput('employee_linegraph', height = 300)
+employee_line_element = card(plotlyOutput('employee_linegraph', height = 300))
 
 # Gross Profit Breakdown Line Graph
-gross_prof_line_element = plotlyOutput('gross_profit_linegraph', height = 300)
+gross_prof_line_element = card(plotlyOutput('gross_profit_linegraph', height = 300))
 
 ### Design Blocks
 
-left_col_cfo = column(width = 7,
-                      card_grid(card_width = 1,
-                                fixed_width = T,
-                                card(
-                                  card_header("Gross Profit",
-                                              class = 'bg-success'),
-                                  card_body(gross_prof_line_element),
-                                  full_screen = T
-                                ),
-                                card(
-                                  card_header("Membership Trend",
-                                              class = 'bg-primary'),
-                                  card_body(membership_line_element),
-                                  full_screen = T
-                                ),
-                                card(
-                                  card_header("Number of Employees",
-                                              class = 'bg-info'),
-                                  card_body(employee_line_element),
-                                  full_screen = T,
-                                  width = 
-                                )
-                      )
+# left_col_cfo = column(width = 7,
+#                       card_grid(card_width = 1,
+#                                 fixed_width = T,
+#                                 card(
+#                                   card_header("Gross Profit",
+#                                               class = 'bg-success'),
+#                                   card_body(gross_prof_line_element),
+#                                   full_screen = T
+#                                 ),
+#                                 card(
+#                                   card_header("Membership Trend",
+#                                               class = 'bg-primary'),
+#                                   card_body(membership_line_element),
+#                                   full_screen = T
+#                                 ),
+#                                 card(
+#                                   card_header("Number of Employees",
+#                                               class = 'bg-info'),
+#                                   card_body(employee_line_element),
+#                                   full_screen = T,
+#                                   width = 
+#                                 )
+#                       )
+# )
+
+figs_col_cfo = tabsetPanel(
+  tabPanel(
+    title = 'Gross Profit',
+    gross_prof_line_element
+  ),
+  tabPanel(
+    title = "Membership Trend",
+    membership_line_element
+  ),
+  tabPanel(
+    title = "Employees",
+    employee_line_element
+  )
 )
 
-van_sum_col_cfo = column(width = 2,
-                         h3("Vancouver"),
-                         card_grid(
-                           card_width = 1,
-                           card(
-                             card_header("Revenue"),
-                             card_body(
-                               textOutput('revenue_sum_van'),
-                               textOutput('revenue_change_van')
-                             )
-                           ),
-                           card(
-                             card_header("Cost"),
-                             card_body(
-                               textOutput('cost_sum_van'),
-                               textOutput('cost_change_van')
-                             )
-                           ),
-                           card(
-                             card_header("Gross Profit"),
-                             card_body(
-                               textOutput('gross_profit_sum_van'),
-                               textOutput('gross_profit_change_van')
-                             )
-                           )
-                         )
-)
-
-vic_sum_col_cfo = column(width = 2,
-                         h3("Victoria"),
-                         card_grid(
-                           card_width = 1,
-                           card(
-                             card_header("Revenue"),
-                             card_body(
-                               textOutput('revenue_sum_vic'),
-                               textOutput('revenue_change_vic')
-                             )
-                           ),
-                           card(
-                             card_header("Cost"),
-                             card_body(
-                               textOutput('cost_sum_vic'),
-                               textOutput('cost_change_vic')
-                             )
-                           ),
-                           card(
-                             card_header("Gross Profit"),
-                             card_body(
-                               textOutput('gross_profit_sum_vic'),
-                               textOutput('gross_profit_change_vic')
-                             )
-                           )
-                         )
+summaries_rows = fluidRow(
+  column(width = 6,
+         h3("Vancouver", style = 'text-align:center;'),
+         card_grid(
+           card_width = 1/3,
+           card(
+             card_header("Revenue",
+                         style = "font-size:22px;text-align:center;background-color:#1B9E77;color:white;"),
+             card_body(
+               div(textOutput('revenue_sum_van'), style = 'height:40px;font-weight:700;font-size:22px;text-align:center'),
+               em(textOutput('revenue_change_van'))
+             )
+           ),
+           card(
+             card_header("Cost",
+                         style = "font-size:22px;text-align:center;background-color:#D95F02;color:white;"),
+             card_body(
+               div(textOutput('cost_sum_van'), style = 'height:40px;font-weight:700;font-size:22px;text-align:center'),
+               em(textOutput('cost_change_van'))
+             )
+           ),
+           card(
+             card_header("Gross Profit",
+                         style = 'font-size:22px;text-align:center;background-color:#7570B3;color:white;'),
+             card_body(
+               div(textOutput('gross_profit_sum_van'), style = 'height:40px;font-weight:700;font-size:22px;text-align:center'),
+               em(textOutput('gross_profit_change_van'))
+             )
+           )
+         )
+  ),
+  column(width = 6,
+         h3("Victoria", style = 'text-align:center;'),
+         card_grid(
+           card_width = 1/3,
+           card(
+             card_header("Revenue",
+                         style = "font-size:22px;text-align:center;background-color:#1B9E77;color:white;"),
+             card_body(
+               div(textOutput('revenue_sum_vic'), style = 'height:40px;font-weight:700;font-size:22px;text-align:center'),
+               em(textOutput('revenue_change_vic'))
+             )
+           ),
+           card(
+             card_header("Cost",
+                         style = "font-size:22px;text-align:center;background-color:#D95F02;color:white;"),
+             card_body(
+               div(textOutput('cost_sum_vic'), style = 'height:40px;font-weight:700;font-size:22px;text-align:center'),
+               textOutput('cost_change_vic')
+             )
+           ),
+           card(
+             card_header("Gross Profit",
+                         style = 'font-size:22px;text-align:center;background-color:#7570B3;color:white;'),
+             card_body(
+               div(textOutput('gross_profit_sum_vic'), style = 'height:40px;font-weight:700;font-size:22px;text-align:center'),
+               textOutput('gross_profit_change_vic')
+             )
+           )
+         )
+  )
 )
 
 rock_gym_daily = tabPanel(
@@ -209,7 +231,7 @@ rock_gym_daily = tabPanel(
     ),
     mainPanel(
       h1("Rock Gym: British Columbia's finest Gym of Rocks."),
-      HTML("<br><br><br>"),
+      HTML("<br><br>"),
       rock_visitation_plotly_element
       # dataTableOutput('data_test')
     )
@@ -231,16 +253,17 @@ rock_gym_cfo = tabPanel(
     sidebarPanel(
       h3("Months to Assess:"),
       month_pick_input,
-      width = 2
+      width = 3
     ),
     mainPanel(
+      width = 9,
       h1("Rock Gym: British Columbia's finest Gym of Rocks."),
-      HTML("<br><br><br>"),
+      HTML("<br><br>"),
       fluidRow(
-        left_col_cfo,
-        van_sum_col_cfo,
-        vic_sum_col_cfo
-      )
+        figs_col_cfo
+      ),
+      summaries_rows
+      # )
     )
   )
 )

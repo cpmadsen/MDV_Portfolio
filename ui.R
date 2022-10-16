@@ -20,6 +20,7 @@ library(mailtoR)
 #remotes::install_github('mdancho84/histoslider')
 library(bslib)
 library(histoslider)
+library(bsicons)
 
 rm(list = ls())
 
@@ -36,10 +37,10 @@ source("01_RockClimbingGym.R")
 source("02_BigFoot.R")
 source("03_UK_Cycling.R")
 
-Theme_buttons = shiny::radioButtons(inputId = 'dark_mode', label = 'Theme', 
-                    choices = c("Light","Dark"), 
-                    selected = "Light",
-                    inline = T)
+theme_buttons = shiny::radioButtons(inputId = 'dark_mode', label = 'Theme', 
+                                    choices = c("Light","Dark"), 
+                                    selected = "Light",
+                                    inline = T)
 
 # Define UI for application that draws a histogram
 ui = shiny::navbarPage(
@@ -53,18 +54,24 @@ ui = shiny::navbarPage(
   theme = app_lightTheme,
   #fluid = T,
   useShinyjs(),
-
+  
   title = div(TITLE),
   main_page,
   rock_gym_daily,
   rock_gym_cfo,
   bigfoot_panel,
   uk_cycling,
-  header = div(
-    tagList(h2("Madsen Data Viz", icon('chart-simple'))),
-    div(Theme_buttons,
-               style = 'text-align:right;')
+  header = fluidRow(
+    column(width = 6,
+           tagList(
+             h2("Madsen Data Viz", icon('chart-simple'))
+           )
     ),
+    column(width = 6,
+           div(
+             theme_buttons,style = 'text-align:right;')
+    )
+  ),
   footer = div(
     fluidRow(
       column(width = 6,
