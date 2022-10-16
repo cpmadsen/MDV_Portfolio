@@ -16,6 +16,11 @@ library(scales)
 library(feedeR)
 library(htmltools)
 library(mailtoR)
+#remotes::install_github('mdancho84/bslib')
+#remotes::install_github('mdancho84/histoslider')
+library(bslib)
+library(histoslider)
+library(bsicons)
 
 rm(list = ls())
 
@@ -23,44 +28,52 @@ rm(list = ls())
 
 box_height = 400
 halfbox_h = 250
+plot_background_colour = "white"
 
+source("bslib_attributes.R")
 source("HelperFunctions.R")
 source("00_MainPage.R")
 source("01_RockClimbingGym.R")
 source("02_BigFoot.R")
 source("03_UK_Cycling.R")
 
+theme_buttons = shiny::radioButtons(inputId = 'dark_mode', label = 'Theme', 
+                                    choices = c("Light","Dark"), 
+                                    selected = "Light",
+                                    inline = T)
+
 # Define UI for application that draws a histogram
-ui = shinydashboardPlus::dashboardPage(
+ui = shiny::navbarPage(
+  # tags$head(
+  #   tags$style(HTML("
+  #                   .navbar-brand {
+  #                   display: flex;
+  #                   }"))
+  # ),
   
-  skin = 'black',
+  theme = app_lightTheme,
+  #fluid = T,
+  useShinyjs(),
   
-  #useShinyjs(),
-  header = dashboardHeader(
-    title = "Madsen Analytics"
-  ),
-  dashboardSidebar(
-    div(sidebarMenu(
-      id = 'tabs',
-      div(tags$img(src = 'MDV_logo.png', height = 250),
-          style = 'font-size:20px;text-align:center;margin-top:10px'),
-      shinydashboard::menuItem(div(h4("Home")), tabName = 'home', badgeColor = "green"),
-      shinydashboard::menuItem(div(h4("Rock Gym Dashboard")), tabName = "rock_gym"),
-      shinydashboard::menuItem(div(h4("Where is Bigfoot?")), tabName = 'bigfoot'),
-      shinydashboard::menuItem(div(h4('Traffic in the UK')), tabName = 'uk_cycling')
-    )),
-    width = 250),
-  dashboardBody(
-    tabItems(
-      main_page,
-      rock_gym,
-      bigfoot_panel,
-      uk_cycling
+  title = div(TITLE),
+  main_page,
+  rock_gym_daily,
+  rock_gym_cfo,
+  bigfoot_panel,
+  uk_cycling,
+  header = fluidRow(
+    column(width = 6,
+           tagList(
+             h2("Madsen Data Viz", icon('chart-simple'))
+           )
     ),
-    tags$head(tags$style(HTML('* {font-family: "-webkit-body"};')))
+    column(width = 6,
+           div(
+             theme_buttons,style = 'text-align:right;')
+    )
   ),
-  footer = dashboardFooter(
-    left = fluidRow(
+  footer = div(
+    fluidRow(
       column(width = 6,
              div(
                tags$a(
