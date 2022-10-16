@@ -8,17 +8,18 @@ shinyServer(function(input, output, session) {
   source(file.path('rock_gym_server.R'), local = T)$value
   source(file.path('bigfoot_server.R'), local = T)$value
   source(file.path('uk_cycling_server.R'), local = T)$value
-
   
   # Light- and Dark-theme switcher
-  # observeEvent(input$dark_mode, {
-  #   if(input$dark_mode == T) {
-  #     bslib::bs_theme_update(theme = app_darkTheme)
-  #   } else if(input$dark_mode == F){
-  #     bslib::bs_theme_update(theme = app_lightTheme)
-  #   }
-  # })
+  observeEvent(input$dark_mode, {
+    if(input$dark_mode == "Light") {
+      session$setCurrentTheme(app_lightTheme)
+      # bs_theme_update(theme = app_darkTheme)
+    } else if(input$dark_mode == "Dark"){
+      session$setCurrentTheme(app_darkTheme)
+    }
+  })
   
+
   #options(httr_oob_default = TRUE, httr_oauth_cache=TRUE)
   
   #gmailr::clear_token()

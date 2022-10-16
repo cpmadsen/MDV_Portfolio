@@ -143,6 +143,8 @@ output$rock_visit_barplot = renderPlotly({
         labs(title = paste0("Visits to Rock Gym by ",input$visits_time_scale),
              x = "", y =  "Number of Visits", fill = "Membership") + 
         theme_bw()
+        # ggplot2::theme(plot.background = element_rect(fill = plot_background_colour),
+        #                panel.background = element_rect(fill = plot_background_colour))
     )
 })
 
@@ -385,6 +387,8 @@ output$gross_profit_linegraph = renderPlotly({
             axis.text = element_text(size = 10),
             title = element_text(size = 14, face = 'bold'),
             legend.position="none") +
+            # plot.background = element_rect(fill = plot_background_colour),
+            # panel.background = element_rect(fill = plot_background_colour)) +
       guides(col = "none"),
     height = 300
   ) %>% layout(legend = list(orientation="h",x = 0.45, y = 1.1))
@@ -419,7 +423,9 @@ output$employee_linegraph = renderPlotly({
       theme(axis.title = element_text(size = 12),
             axis.text = element_text(size = 10),
             title = element_text(size = 14, face = 'bold'),
-            legend.position="none") + 
+            legend.position="none") +
+            # plot.background = element_rect(fill = plot_background_colour),
+            # panel.background = element_rect(fill = plot_background_colour)) + 
       guides(col = "none"),
     height = 300
   ) %>% layout(legend = list(orientation="h",x = 0.45, y = 1.1))
@@ -454,7 +460,9 @@ output$members_linegraph = renderPlotly({
       theme(axis.title = element_text(size = 12),
             axis.text = element_text(size = 10),
             title = element_text(size = 14, face = 'bold'),
-            legend.position="none") + 
+            legend.position="none") +
+            # plot.background = element_rect(fill = plot_background_colour),
+            # panel.background = element_rect(fill = plot_background_colour)) + 
       guides(col = "none"),
     height = 300
   ) %>% layout(legend = list(orientation="h",x = 0.45, y = 1.1))

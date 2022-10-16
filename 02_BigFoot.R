@@ -7,12 +7,6 @@ bf_map_height = '500px'
 
 # 1. Map for center of dashboard tab.
 bf_map_element = card(
-  card_title(tagList(shiny::icon("paw"),"Bigfoot in the World             Change Options with Gear icon -->")), 
-  # status = "success",
-  # solidHeader = T,
-  # width = 12,
-  # height = bf_map_height,
-  # sidebar = boxSidebar(),
   leafletOutput('bigfoot_map',height = bf_map_height)
 )
 
@@ -20,7 +14,7 @@ bf_map_element = card(
 
 map_controls_sidebar_panel = sidebarPanel(
   selectInput(inputId = "bigfoot_filter",
-              label = "Select Area of Analysis",
+              label = "Select Map Scale",
               multiple = F,
               selectize = F,
               selected = c("Canada"),
@@ -37,9 +31,6 @@ map_controls_sidebar_panel = sidebarPanel(
 
 # 2. Vertical bar plot for beside map.
 bf_vertbarplot_element = card(
-  title = tagList(shiny::icon("map"),"Reports Broken Down by Region"), 
-  # width = 12,
-  # height = bf_map_height,
   numericInput(
     inputId = "binning_number",
     label = "Number of Groups to Show",
@@ -52,15 +43,28 @@ bf_vertbarplot_element = card(
 
 # 3. Summary Blocks
 
-bf_totalnumber_element = infoBoxOutput('total_summary')
+bf_totalnumber_element = card(
+  card_header("Total Reports",
+             class = 'bg-primary'),
+  card_body(textOutput('total_summary'))
+)
 
-bf_recentdate_element = infoBoxOutput('most_recent_date')
+bf_recentdate_element = card(
+  card_header("Most Recent Report",
+             class = 'bg-warning'),
+  card_body(textOutput('most_recent_date'))
+)
 
-bf_recentplace_element = infoBoxOutput('most_recent_place')
+bf_recentplace_element = card(
+  card_header("Most Recent Sighting",
+             class = 'bg-info'),
+  card_body(textOutput('most_recent_place'))
+)
 
 # 4. Bigfoot in the news.
 bfnews_element = card(
-  title = tagList(shiny::icon("newspaper"),"Bigfoot in the News"),
+  card_header(tagList(shiny::icon("newspaper"),"Bigfoot in the News"),
+             class = 'bg-warning'),
   #gradient = T,
   # width = 12,
   # boxToolSize = 'sm',
@@ -72,12 +76,11 @@ bfnews_element = card(
 ### Design Blocks
 
 toprow_block = fluidRow(
-  #column(width = 3, mapcontrol_element),
-  column(width = 8, bf_map_element),
-  column(width = 4, bf_vertbarplot_element)
+  bf_map_element
 )
 
-middlerow_block = fluidRow(
+middlerow_block = card_grid(
+  card_width = 1/3,
   bf_totalnumber_element,
   bf_recentdate_element,
   bf_recentplace_element
@@ -88,12 +91,22 @@ bottomrow_block = fluidRow(bfnews_element)
 ### Panel design
 
 bigfoot_panel = tabPanel(
-  title = "Where in the World is Bigfoot?",
-  icon = icon('paw'),
+  title = span(tagList(icon('paw'),"Where in the World is Bigfoot?")),
+  fluidRow(
+    h1("Where in the World is Bigfoot?"),
+    style = 'text-align:center;'),
   sidebarLayout(
-    sidebarPanel = map_controls_sidebar_panel,
+    sidebarPanel(
+      accordion(
+        selected = I("Reports Broken Down by Region"),
+        accordion_item(
+          "Select Area of Analysis",
+          map_controls_sidebar_panel),
+        accordion_item(
+          "Reports Broken Down by Region",
+          bf_vertbarplot_element))
+    ),
     mainPanel(
-      h2("Where in the World is Bigfoot?"),
       toprow_block,
       middlerow_block,
       bottomrow_block

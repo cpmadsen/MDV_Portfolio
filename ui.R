@@ -27,6 +27,7 @@ rm(list = ls())
 
 box_height = 400
 halfbox_h = 250
+plot_background_colour = "white"
 
 source("bslib_attributes.R")
 source("HelperFunctions.R")
@@ -34,6 +35,11 @@ source("00_MainPage.R")
 source("01_RockClimbingGym.R")
 source("02_BigFoot.R")
 source("03_UK_Cycling.R")
+
+Theme_buttons = shiny::radioButtons(inputId = 'dark_mode', label = 'Theme', 
+                    choices = c("Light","Dark"), 
+                    selected = "Light",
+                    inline = T)
 
 # Define UI for application that draws a histogram
 ui = shiny::navbarPage(
@@ -44,17 +50,21 @@ ui = shiny::navbarPage(
   #                   }"))
   # ),
   
-  theme = app_lighttTheme,
-  header = switchInput(inputId = 'dark_mode', label = 'Mode', 
-                       onLabel = "Dark", offLabel = 'Light'),
+  theme = app_lightTheme,
   #fluid = T,
   useShinyjs(),
 
   title = div(TITLE),
   main_page,
-  rock_gym,
+  rock_gym_daily,
+  rock_gym_cfo,
   bigfoot_panel,
   uk_cycling,
+  header = div(
+    tagList(h2("Madsen Data Viz", icon('chart-simple'))),
+    div(Theme_buttons,
+               style = 'text-align:right;')
+    ),
   footer = div(
     fluidRow(
       column(width = 6,

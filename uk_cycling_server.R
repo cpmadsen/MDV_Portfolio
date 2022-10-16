@@ -37,80 +37,42 @@ CyclingAccidentLinePlotDat = reactive({
         pull(region)))
 })
 # Summary info boxes.
-output$uk_fatal_accidents = renderInfoBox({
-  infoBox(
-    "Fatal Accidents",
-    CyclingAccidentSummaries() %>% 
-      filter(CycleAccOutcome == "Killed") %>% 
-      pull(num_accidents),
-    icon = icon("skull"),
-    color = 'red', fill = T,
-    width = 4
-  )
+output$uk_fatal_accidents = renderText({
+  CyclingAccidentSummaries() %>% 
+    filter(CycleAccOutcome == "Killed") %>% 
+    pull(num_accidents)
 })
 
-output$uk_serious_accidents = renderInfoBox({
-  infoBox(
-    "Serious Injury Accidents",
-    CyclingAccidentSummaries() %>% 
-      filter(CycleAccOutcome == "Seriously injured") %>% 
-      pull(num_accidents),
-    icon = icon("exclamation"),
-    color = 'orange', fill = T,
-    width = 4
-  )
+output$uk_serious_accidents = renderText({
+  CyclingAccidentSummaries() %>% 
+    filter(CycleAccOutcome == "Seriously injured") %>% 
+    pull(num_accidents)
 })
 
-output$uk_total_accidents = renderInfoBox({
-  infoBox(
-    "Total Accidents",
-    CyclingAccidentSummaries() %>% 
-      filter(CycleAccOutcome == "Total") %>% 
-      pull(num_accidents),
-    icon = icon("person-falling-burst"),
-    color = 'yellow', fill = T,
-    width = 4
-  )
+output$uk_total_accidents = renderText({
+  CyclingAccidentSummaries() %>% 
+    filter(CycleAccOutcome == "Total") %>% 
+    pull(num_accidents)
 })
 
-output$uk_tot_proj = renderInfoBox({
-  infoBox(
-    "# of Projects",
-    CyclingAccidents() %>% 
-      summarise(total = sum(total_projects_by_region, na.rm=T)) %>% 
-      pull(total),
-    subtitle = 'New Cycling Infrastructure',
-    icon = icon("list-check"),
-    color = 'green', fill = T,
-    width = 4
-  )
+output$uk_tot_proj = renderText({
+  CyclingAccidents() %>% 
+    summarise(total = sum(total_projects_by_region, na.rm=T)) %>% 
+    pull(total)
 })
 
-output$uk_tot_scheme_cost = renderInfoBox({
-  infoBox(
-    title = "Total Scheme Costs",
-    value = scales::dollar(CyclingAccidents() %>% 
-                             summarise(total = sum(annual_total_schemes_cost, na.rm=T)) %>% 
-                             pull(total),
-                           prefix='£'),
-    icon = icon("sterling-sign"),
-    color = 'blue',
-    width = 4
-  )
+output$uk_tot_scheme_cost = renderText({
+  scales::dollar(CyclingAccidents() %>% 
+                   summarise(total = sum(annual_total_schemes_cost, na.rm=T)) %>% 
+                   pull(total),
+                 prefix='')
 })
 
-output$uk_tot_df_t_funding = renderInfoBox({
-  infoBox(
-    title = "DFT Funding",
-    value = scales::dollar(CyclingAccidents() %>% 
-                             summarise(total = sum(annual_df_t_funding, na.rm=T)) %>% 
-                             pull(total),
-                           prefix='£'),
-    subtitle = '(Department for Transporation)',
-    icon = icon("project"),
-    color = 'purple', fill = T,
-    width = 4
-  )
+output$uk_tot_df_t_funding = renderText({
+  scales::dollar(CyclingAccidents() %>% 
+                   summarise(total = sum(annual_df_t_funding, na.rm=T)) %>% 
+                   pull(total),
+                 prefix='')
 })
 
 output$uk_cycling_leaflet = renderLeaflet({
@@ -159,7 +121,9 @@ output$cycling_lineplot = renderPlotly({
       scale_x_continuous(breaks = scales::pretty_breaks()) +
       scale_fill_brewer(palette = 'Set3') +
       ggpubr::theme_pubr() + 
-      theme(legend.position = 'none') + 
+      theme(legend.position = 'none') +
+            # plot.background = element_rect(fill = plot_background_colour),
+            # panel.background = element_rect(fill = plot_background_colour)) + 
       labs(y = "No. Accidents per Region", 
            x = "Year"),
     tooltip = c("region","num_accidents")
@@ -191,6 +155,8 @@ output$cycling_acc_region_barplot = renderPlotly({
       theme(legend.position = 'none') + 
       theme(axis.text.x = element_blank(),
             axis.title = element_text(size = 14)) +
+            # plot.background = element_rect(fill = plot_background_colour),
+            # panel.background = element_rect(fill = plot_background_colour)) +
       labs(y = "No. Accidents per Region", 
            x = "Region"),
     tooltip = c("region","num_accidents")

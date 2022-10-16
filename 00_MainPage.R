@@ -4,21 +4,19 @@ background_img_3 = "carousel_pictures/Germany_BlackForest.png"
 
 title_insert = absolutePanel(
   fluidRow(
-  HTML("<br><br><br><br><br><br>"),
   h1("MADSEN ANALYTICS",
-     style = 'height: 50px; font-size:65px; color:white; text-align:center;'),
+     style = 'height: 50px; font-size:65px; color:white; text-align:center;padding:80px'),
   HTML("<br><br>"),
   h2("State-of-the-art data analytics and dashboards",
-     style = 'height: 50px; font-size:50px; color:white; text-align:center;'),
+     style = 'height: 50px; font-size:50px; color:white; text-align:center;padding:80px;'),
   width = '100%'),
   style = 'margin-left:100px;'
 )
 
 second_insert = fluidRow(
-  HTML("<br><br>"),
   h1("Explore your Data to Make Informed Decisions",
-     style = 'text-align:center;'),
-  HTML("<br><br>"),
+     style = 'text-align:center;center;padding:60px'),
+  HTML("<br><br><br><br>"),
   h2("Data records can be opaque or confusing; however, I can help make your data transparent and highlight important trends and decision points.",
      style = 'text-align:center;margin:30px'),
   HTML("<br>"),
@@ -48,29 +46,30 @@ second_insert = fluidRow(
                # shiny::icon(name = "tachometer-alt", style = 'font-size:75px;'),
                img(src = 'dashboard_icon.png'),
                h3("Bespoke dashboards"),
-               style = 'text-align:center;font-size:1px;')
+               style = 'text-align:center;font-size:1px;'),
+        HTML("<br><br><br>")
       )
   ),
   style = 'padding-left:100px; padding-right:100px'
 )
 
 third_insert = fluidRow(
-  h1("Qualifications",style = 'text-align:center;'),
+  h1("Qualifications",style = 'text-align:center;center;padding:60px'),
   column(width = 4,
          img(src = "CM_Headshot.png")),
   column(width = 8,
-         h2("Educational",style = 'font-weight:bold;'),
+         h2("Educational",style = 'font-weight:bold;center;padding:20px'),
          h3("2019 Master of Science in Biology from McGill University"),
          h3("2015 Honours Undergraduate Degree in Biology from the University of Victoria"),
          HTML("<br>"),
-         h2("Professional",style = 'font-weight:bold;'),
+         h2("Professional",style = 'font-weight:bold;center;padding:20px'),
          h3("2 years as Data Visualization Specialist and GIS analyst with the British Columbian Provincial Government"),
          h3("6 months as Forest Restoration Scientist with Parks Canada"),
          style = 'text-align:left;')
 )
 
 contact_form_insert = fluidRow(
-  h1("Contact Form", style = 'text-align:center;'),
+  h1("Contact Form", style = 'text-align:center;center;padding:40px'),
   textInput(
     inputId = 'user_contact_email',
     label = "Your E-mail Address:",
@@ -96,7 +95,7 @@ contact_form_insert = fluidRow(
 
 main_page = tabPanel(
   title = "Home",
-  icon = icon('home'),
+  icon = icon('fas fa-house'),
   
   #tags$script(src = "Javascript_Parallax.js"),
   # shinyWidgets::setBackgroundImage(src = "waterfall_gif.gif", 

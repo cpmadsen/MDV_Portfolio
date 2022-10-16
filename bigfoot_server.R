@@ -105,52 +105,39 @@ output$bigfoot_barplot = renderPlotly({
       summarise(most_recent_report = max(most_recent_report),
                 num_listings = sum(num_listings)) %>% 
       ggplot() + 
-      geom_col(aes(x = subunit, y = num_listings)) + 
+      geom_col(aes(x = subunit, y = num_listings, fill = num_listings)) + 
       scale_x_discrete(labels = scales::label_wrap(width = 8)) + 
       coord_flip() +
-      #scale_fill_brewer(palette = "Dark2") +
+      scale_fill_continuous("viridis") +
       labs(x = "", y = "Number of Reports", title = "Reports by Region") +
       ggpubr::theme_pubr() + 
       theme(legend.position = "none")
+            # plot.background = element_rect(fill = plot_background_colour),
+            # panel.background = element_rect(fill = plot_background_colour))
   )
 })
 
-output$total_summary = renderInfoBox({
-  infoBox(
-    "Total Reports",
+output$total_summary = renderText({
     MappingDat() %>%
       st_drop_geometry() %>%
       summarise(total = sum(num_listings)) %>%
-      pull(total),
-    icon = icon("credit-card"),
-    color = 'lime', fill = T
-  )
+      pull(total)
 })
 
-output$most_recent_date = renderInfoBox({
-  infoBox(
-    "Most Recent Report",
+output$most_recent_date = renderText({
     MappingDat() %>% 
       st_drop_geometry() %>% 
       mutate(most_recent_report = lubridate::ymd(most_recent_report)) %>% 
       summarise(latest = max(most_recent_report)) %>% 
-      pull(latest),
-    icon = icon("credit-card"),
-    color = 'orange', fill = T
-  )
+      pull(latest)
 })
 
-output$most_recent_place = renderInfoBox({
-  infoBox(
-    "Recent Report Location",
+output$most_recent_place = renderText({
     MappingDat() %>% 
       st_drop_geometry() %>% 
       arrange(desc(most_recent_report)) %>% 
       slice(1) %>% 
-      pull(subunit),
-    icon = icon("credit-card"),
-    color = 'purple', fill = T
-  )
+      pull(subunit)
 })
 
 #News feed - slickR carousel
