@@ -1,3 +1,4 @@
+library(flexdashboard)
 library(shiny)
 library(shinydashboard)
 library(shinydashboardPlus)
@@ -22,20 +23,24 @@ library(bslib)
 library(histoslider)
 library(bsicons)
 
+
 rm(list = ls())
 
 # setwd("F:/R Projects/cpmadsen.github.io/")
 
-box_height = 400
-halfbox_h = 250
+# box_height = 400
+# halfbox_h = 250
 plot_background_colour = "white"
 
 source("bslib_attributes.R")
 source("HelperFunctions.R")
 source("00_MainPage.R")
-source("01_RockClimbingGym.R")
+source("01_01_RockClimbingDaily.R")
+source("01_02_RockClimbingCFO.R")
 source("02_BigFoot.R")
 source("03_UK_Cycling.R")
+source("04_AboutMe.R")
+source("05_Contact.R")
 
 theme_buttons = shiny::radioButtons(inputId = 'dark_mode', label = 'Theme', 
                                     choices = c("Light","Dark"), 
@@ -55,26 +60,47 @@ ui = shiny::navbarPage(
   #fluid = T,
   useShinyjs(),
   
-  title = div(TITLE),
+  # title = div(
+  #   column(width = 12,
+  #          tagList(
+  #            h2("Madsen Data Viz", icon('chart-simple'))
+  #          )),
+  #   column(width = 12,
+  #          theme_buttons)
+  # ),
+  
+  title = tagList(h2("Madsen Data Viz", icon('chart-simple'))),
+  
   main_page,
-  rock_gym_daily,
-  rock_gym_cfo,
-  bigfoot_panel,
-  uk_cycling,
-  header = fluidRow(
-    column(width = 6,
-           tagList(
-             h2("Madsen Data Viz", icon('chart-simple'))
-           )
-    ),
-    column(width = 6,
-           div(
-             theme_buttons,style = 'text-align:right;')
-    )
+  
+  navbarMenu(
+    title = "Portfolio",
+    rock_gym_daily,
+    rock_gym_cfo,
+    bigfoot_panel,
+    uk_cycling
   ),
+  about_me_panel,
+  contact_panel,
+  # header = fluidRow(
+  #   column(width = 6,
+  #          tagList(
+  #            h2("Madsen Data Viz", icon('chart-simple'))
+  #          )
+  #   ),
+  #   column(width = 6,
+  #          div(
+  #            theme_buttons,style = 'text-align:right;')
+  #   )
+  # ),
   footer = div(
     fluidRow(
-      column(width = 6,
+      h3("Contact Links",
+         style = 'text-align:center;'),
+      column(width = 1,
+             theme_buttons
+             ),
+      column(width = 5,
              div(
                tags$a(
                  icon(name = 'envelope',

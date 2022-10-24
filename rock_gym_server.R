@@ -1,9 +1,20 @@
-# # # # # # # # # #
-# Tab 1 - Rock Gym#
-# # # # # # # # # #
+# # # # # # # # # # #
+#     Rock Gym      #
+# # # # # # # # # # #
+
 rock_dat = read_csv("data/rock_dat.csv")
 rock_visit_dat = read_csv('data/rock_visit_data.csv')
 
+rock_dat = rock_dat %>%
+  group_by(location) %>%
+  mutate(membership_goal = case_when(
+    location == "Vancouver" ~ row_number()*50+800,
+    location == "Victoria" ~ row_number()*40+500)
+  ) %>%
+  mutate(program_signups = sample(40:65, 6, replace = T)) %>%
+  ungroup()
+  
+# # # REACTIVE DATASETS # # # 
 RockDat = reactive({
   
   #Convert abbreviated month labels to numbers, find total range of months, then relabel them.
@@ -219,6 +230,56 @@ updateSelectInput(
 
 # Summary stats
 
+output$program_slots_full_van = renderGauge({
+  gauge(RockDat() %>%
+          filter(location == "Vancouver") %>% 
+          slice_tail(n = 1) %>%
+          pull(program_signups),
+        min = 0, max = 60,
+        label = "Vancouver",
+        sectors = gaugeSectors(success = c(50,60),
+                               warning = c(30,50),
+                               danger = c(0,30)))
+})
+
+output$program_slots_full_vic = renderGauge({
+  gauge(RockDat() %>%
+          filter(location == "Victoria") %>% 
+          slice_tail(n = 1) %>%
+          pull(program_signups),
+        min = 0, max = 60,
+        label = "Victoria",
+        sectors = gaugeSectors(success = c(50,60),
+                               warning = c(30,50),
+                               danger = c(0,30)))
+})
+
+output$membership_goal_van = renderGauge({
+  
+  the.goal = RockDat() %>% filter(location == "Vancouver") %>% slice_tail(n=1) %>% pull(membership_goal)
+  the.real = RockDat() %>% filter(location == "Vancouver") %>% slice_tail(n=1) %>% pull(members)
+  
+  gauge(value = 100*(the.real / the.goal),
+        min = 0, max = 100,
+        label = "Vancouver",
+        sectors = gaugeSectors(success = c(80,100),
+                               warning = c(50,80),
+                               danger = c(0,50)))
+})
+
+output$membership_goal_vic = renderGauge({
+
+  the.goal = RockDat() %>% filter(location == "Victoria") %>% slice_tail(n=1) %>% pull(membership_goal)
+  the.real = RockDat() %>% filter(location == "Victoria") %>% slice_tail(n=1) %>% pull(members)
+
+  gauge(value = 100*(the.real / the.goal),
+        min = 0, max = 100,
+        label = "Victoria",
+        sectors = gaugeSectors(success = c(80,100),
+                               warning = c(50,80),
+                               danger = c(0,50)))
+})
+
 output$gross_profit_sum_van = renderText({
  RockDat() %>%
           filter(location == "Vancouver") %>%
@@ -362,11 +423,11 @@ output$gross_profit_linegraph = renderPlotly({
       ggplot(aes(x = date, y = Amount)) +
       geom_col(aes(x = date, y = Amount, fill = Type),
                color = 'black',
-               position = position_dodge2(padding = 0.3)) +
+               position = position_dodge2(padding = -0.3)) +
       geom_line(aes(x = date, y = Amount, col = Type, group = Type),
                 alpha = 0.8,
                 size = 1) +
-      geom_point(aes(x = date, y = Amount, col = Type),
+      geom_point(aes(x = date, y = Amount, col = Type, group = Type),
                  shape = 1, size = 4, stroke = 1) +
       geom_segment(aes(x = min(date),
                        xend = max(date),
@@ -390,7 +451,7 @@ output$gross_profit_linegraph = renderPlotly({
             # plot.background = element_rect(fill = plot_background_colour),
             # panel.background = element_rect(fill = plot_background_colour)) +
       guides(col = "none"),
-    height = 300
+    height = box_height
   ) %>% layout(legend = list(orientation="h",x = 0.45, y = 1.1))
 })
 
@@ -400,7 +461,7 @@ output$employee_linegraph = renderPlotly({
       ggplot() + 
       geom_col(aes(x = date, y = employees, fill = location), 
                col = 'black',
-               position = position_dodge2(padding = 0.3)) +
+               position = position_dodge2(padding = -0.3)) +
       geom_line(aes(x = date, y = employees, col = location, group = location),
                 alpha = 0.8,
                 size = 1) +
@@ -427,7 +488,7 @@ output$employee_linegraph = renderPlotly({
             # plot.background = element_rect(fill = plot_background_colour),
             # panel.background = element_rect(fill = plot_background_colour)) + 
       guides(col = "none"),
-    height = 300
+    height = box_height/2
   ) %>% layout(legend = list(orientation="h",x = 0.45, y = 1.1))
 })
 
@@ -437,7 +498,7 @@ output$members_linegraph = renderPlotly({
       ggplot(aes(x = date, y = members)) + 
       geom_col(aes(fill = location), 
                color = 'black',
-               position = position_dodge2(padding = 0.3)) +
+               position = position_dodge2(padding = -0.3)) +
       geom_line(aes(col = location, group = location),
                 alpha = 0.8,
                 size = 1) +
@@ -464,6 +525,6 @@ output$members_linegraph = renderPlotly({
             # plot.background = element_rect(fill = plot_background_colour),
             # panel.background = element_rect(fill = plot_background_colour)) + 
       guides(col = "none"),
-    height = 300
+    height = box_height/2
   ) %>% layout(legend = list(orientation="h",x = 0.45, y = 1.1))
 })
